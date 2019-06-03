@@ -1,10 +1,12 @@
-/* Credit: https://github.com/PPartisan/Simple-Alarms/ */
+/* Credit for template: https://github.com/PPartisan/Simple-Alarms/ */
 
 package com.suhasdara.walkalarm;
 
+import android.support.annotation.NonNull;
+
 import java.util.Arrays;
 
-public class Alarm {
+class Alarm {
     private final long id;
     private long time;
     private String label;
@@ -43,24 +45,27 @@ public class Alarm {
         return id;
     }
 
-    void setTime(long time) {
+    void setTime(long time, AlarmDatabaseHelper db) {
         this.time = time;
+        db.updateQuery(id, AlarmContract.TIME, time);
     }
 
     long getTime() {
         return time;
     }
 
-    void setLabel(String label) {
+    void setLabel(String label, AlarmDatabaseHelper db) {
         this.label = label;
+        db.updateQuery(id, AlarmContract.LABEL, label);
     }
 
     String getLabel() {
         return label;
     }
 
-    void setDay(int day, boolean isAlarmed) {
+    void setDay(int day, boolean isAlarmed, AlarmDatabaseHelper db) {
         allDays[day] = isAlarmed;
+        db.updateQuery(id, AlarmContract.DAYS, convertArrayToString(allDays));
     }
 
     boolean[] getDays() {
@@ -71,18 +76,21 @@ public class Alarm {
         return allDays[day];
     }
 
-    void turnOn() {
+    void turnOn(AlarmDatabaseHelper db) {
         this.isEnabled = true;
+        db.updateQuery(id, AlarmContract.ENABLED, "" + isEnabled);
     }
 
-    void turnOff() {
+    void turnOff(AlarmDatabaseHelper db) {
         this.isEnabled = false;
+        db.updateQuery(id, AlarmContract.ENABLED, "" + isEnabled);
     }
 
     boolean isEnabled() {
         return isEnabled;
     }
 
+    @Override
     public String toString() {
         return id + "\n" +
                time + "\n" +
@@ -91,7 +99,7 @@ public class Alarm {
                isEnabled + "\n";
     }
 
-    private static boolean[] buildDaysArray(int... days) {
+    private static boolean[] buildDaysArray(@NonNull int... days) {
         final boolean[] array = buildBaseDaysArray();
 
         for (int day : days) {
@@ -113,5 +121,32 @@ public class Alarm {
         array[SAT] = false;
 
         return array;
+    }
+
+    private static final String strSeparator = "_,_";
+
+    @NonNull
+    private static String convertArrayToString(@NonNull boolean[] arr) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < arr.length; i++) {
+            str.append(arr[i]);
+            // Do not append comma at the end of last element
+            if(i < arr.length - 1){
+                str.append(strSeparator);
+            }
+        }
+
+        return str.toString();
+    }
+
+    private static boolean[] convertStringToBoolArray(@NonNull String str) {
+        String[] arr = str.split(strSeparator);
+        boolean[] res = new boolean[arr.length];
+
+        for(int i = 0; i < arr.length; i++) {
+            res[i] = Boolean.parseBoolean(arr[i]);
+        }
+
+        return res;
     }
 }
