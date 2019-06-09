@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AlarmView">
+        <attr name="time_text" format="string" />
+        <attr name="days_content" format="string" />
+        <attr name="enabled" format="boolean" />
+    </declare-styleable>
+</resources>

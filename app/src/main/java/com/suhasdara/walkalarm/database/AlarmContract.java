@@ -1,4 +1,4 @@
-package com.suhasdara.walkalarm;
+package com.suhasdara.walkalarm.database;
 
 import android.provider.BaseColumns;
 
