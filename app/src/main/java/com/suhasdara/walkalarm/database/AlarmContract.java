@@ -7,16 +7,16 @@ class AlarmContract implements BaseColumns {
 
     static final String TABLE_NAME = "alarms";
     static final String TIME = "time";
-    static final String LABEL = "label";
+    static final String NAME = "name";
     static final String DAYS = "days";
     static final String ENABLED = "enabled";
 
     static final String CREATE_QUERY = "CREATE TABLE " + TABLE_NAME +  " (" +
-            _ID + " INTEGER NOT NULL AUTO_INCREMENT, " +
+            _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             TIME + " INTEGER, " +
-            LABEL + " TEXT, " +
+            NAME + " TEXT, " +
             DAYS + " TEXT, " +
-            ENABLED + " TEXT)";
+            ENABLED + " INTEGER)";
 
     static final String DROP_QUERY = "DROP TABLE IF EXISTS " + TABLE_NAME;
 }

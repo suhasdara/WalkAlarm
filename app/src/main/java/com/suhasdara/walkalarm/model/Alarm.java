@@ -2,17 +2,18 @@
 
 package com.suhasdara.walkalarm.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.SparseBooleanArray;
 
 import com.suhasdara.walkalarm.database.AlarmDatabaseHelper;
 
-import java.util.Arrays;
-
-public class Alarm {
-    private final long id;
+public class Alarm implements Parcelable {
+    private long id;
     private long time;
-    private String label;
-    private boolean[] days;
+    private String name;
+    private SparseBooleanArray days;
     private boolean enabled;
 
     public static final int NUM_DAYS = 7;
@@ -24,27 +25,69 @@ public class Alarm {
     public static final int FRI = 5;
     public static final int SAT = 6;
 
-    public Alarm(long id, long time, String label, int... days) {
-        this.id = id;
-        this.time = time;
-        this.label = label;
-        this.days = buildDaysArray(days);
+    public static final int NO_ID = -1;
+
+    private Alarm(Parcel in) {
+        id = in.readLong();
+        time = in.readLong();
+        name = in.readString();
+        days = in.readSparseBooleanArray();
+        enabled = in.readByte() != 0;
     }
 
-    public Alarm(long id, long time, String label, boolean[] days) {
-        this(id, time, label, days, false);
+    public static final Creator<Alarm> CREATOR = new Creator<Alarm>() {
+        @Override
+        public Alarm createFromParcel(Parcel source) {
+            return new Alarm(source);
+        }
+
+        @Override
+        public Alarm[] newArray(int size) {
+            return new Alarm[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public Alarm(long id, long time, String label, boolean[] days, boolean enabled) {
-        this.id = id;
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeLong(time);
+        parcel.writeString(name);
+        parcel.writeSparseBooleanArray(days);
+        parcel.writeByte((byte) (enabled ? 1 : 0));
+    }
+
+    public Alarm(long time, String name, int... days) {
+        this(time, name, buildDaysArray(days), false);
+    }
+
+    public Alarm(long time, String name, SparseBooleanArray days) {
+        this(time, name, days, false);
+    }
+
+    public Alarm(long time, String name, SparseBooleanArray days, boolean enabled) {
         this.time = time;
-        this.label = label;
+        this.name = name;
         this.days = days;
         this.enabled = enabled;
+        this.id = NO_ID;
+    }
+
+    public Alarm(long id, long time, String name, SparseBooleanArray days, boolean enabled) {
+        this(time, name, days, enabled);
+        this.id = id;
     }
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setTime(long time) {
@@ -55,24 +98,28 @@ public class Alarm {
         return time;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLabel() {
-        return label;
+    public String getName() {
+        return name;
     }
 
-    public void setDay(int day, boolean isAlarmed) {
-        days[day] = isAlarmed;
+    public void setDays(SparseBooleanArray days) {
+        this.days = days;
     }
 
-    public boolean[] getDays() {
+    public SparseBooleanArray getDays() {
         return days;
     }
 
+    public void setDay(int day, boolean isAlarmed) {
+        days.put(day, isAlarmed);
+    }
+
     public boolean getDay(int day){
-        return days[day];
+        return days.get(day);
     }
 
     public void setEnabled(boolean enabled) {
@@ -84,38 +131,42 @@ public class Alarm {
     }
 
     public void updateInDatabase(AlarmDatabaseHelper db) {
-        db.updateAlarm(this);
+        if(id != NO_ID) {
+            db.updateAlarm(this);
+        } else {
+            insertInDatabase(db);
+        }
+    }
+
+    public void insertInDatabase(AlarmDatabaseHelper db) {
+        db.insertAlarm(this);
     }
 
     @Override
     public String toString() {
         return id + "\n" +
                time + "\n" +
-               label + "\n" +
-               Arrays.toString(days) + "\n" +
+               name + "\n" +
+               days + "\n" +
                enabled + "\n";
     }
 
-    private static boolean[] buildDaysArray(@NonNull int... days) {
-        final boolean[] array = buildBaseDaysArray();
+    private static SparseBooleanArray buildDaysArray(@NonNull int... days) {
+        final SparseBooleanArray array = buildBaseDaysArray();
 
         for (int day : days) {
-            array[day] = true;
+            array.put(day, true);
         }
 
         return array;
     }
 
-    private static boolean[] buildBaseDaysArray() {
-        final boolean[] array = new boolean[NUM_DAYS];
+    public static SparseBooleanArray buildBaseDaysArray() {
+        final SparseBooleanArray array = new SparseBooleanArray();
 
-        array[SUN] = false;
-        array[MON] = false;
-        array[TUES] = false;
-        array[WED] = false;
-        array[THURS] = false;
-        array[FRI] = false;
-        array[SAT] = false;
+        for(int i = SUN; i <= SAT; i++) {
+            array.put(i, false);
+        }
 
         return array;
     }
@@ -123,26 +174,24 @@ public class Alarm {
     private static final String strSeparator = "_";
 
     @NonNull
-    public static String convertArrayToString(@NonNull boolean[] arr) {
+    public static String convertArrayToString(@NonNull SparseBooleanArray arr) {
         StringBuilder str = new StringBuilder();
-        for (int i = 0; i < arr.length; i++) {
-            str.append(arr[i]);
-            // Do not append comma at the end of last element
-            if(i < arr.length - 1){
-                str.append(strSeparator);
-            }
+        str.append(arr.get(SUN));
+        for (int i = 1; i < arr.size(); i++) {
+            str.append(strSeparator);
+            str.append(arr.get(i));
         }
 
         return str.toString();
     }
 
     @NonNull
-    public static boolean[] convertStringToBoolArray(@NonNull String str) {
+    public static SparseBooleanArray convertStringToBoolArray(@NonNull String str) {
         String[] arr = str.split(strSeparator);
-        boolean[] res = new boolean[arr.length];
+        SparseBooleanArray res = buildBaseDaysArray();
 
         for(int i = 0; i < arr.length; i++) {
-            res[i] = Boolean.parseBoolean(arr[i]);
+            res.put(i, Boolean.parseBoolean(arr[i]));
         }
 
         return res;

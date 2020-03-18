@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.support.annotation.StyleableRes;
 import android.text.Html;
 import android.util.AttributeSet;
+import android.util.SparseBooleanArray;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -12,49 +13,91 @@ import android.widget.TextView;
 import com.suhasdara.walkalarm.R;
 import com.suhasdara.walkalarm.model.Alarm;
 
+import java.util.Calendar;
+
 public class AlarmView extends LinearLayout {
 
     private TextView time;
+    private String timeText;
     private TextView days;
+    private SparseBooleanArray daysBool;
     private Switch enabler;
+    private boolean enabled;
 
     private static final String[] DAY_LETTERS = {"S", "M", "T", "W", "T", "F", "S"};
+
+    public AlarmView(Context context) {
+        super(context);
+        inflate(context, R.layout.alarm_view, this);
+        initComponents();
+        setTime();
+        setDays();
+        setEnabler();
+    }
+
+    public AlarmView(Context context, Alarm alarm) {
+        super(context);
+        inflate(context, R.layout.alarm_view, this);
+        initComponents();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(alarm.getTime());
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int minute = cal.get(Calendar.MINUTE);
+        timeText = (hour < 10 ? "0" : "") + hour + ":" + (minute < 10 ? "0" : "") + minute;
+
+        daysBool = alarm.getDays();
+        enabled = alarm.isEnabled();
+        setTime();
+        setDays();
+        setEnabler();
+    }
 
     public AlarmView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public AlarmView(Context context, String time_text, String days_text, boolean enabler) {
+    public AlarmView(Context context, String timeText, String daysString, boolean enabled) {
         super(context);
         inflate(context, R.layout.alarm_view, this);
         initComponents();
-        setTime(time_text);
-        setDays(days_text);
-        setEnabler(enabler);
+        this.timeText = timeText;
+        assert(daysString != null);
+        this.daysBool = Alarm.convertStringToBoolArray(daysString);
+        this.enabled = enabled;
+        setTime();
+        setDays();
+        setEnabler();
     }
 
     private void init(Context context, AttributeSet attrs) {
-        @StyleableRes
-        int index0 = 0;
-        @StyleableRes
-        int index1 = 1;
-        @StyleableRes
-        int index2 = 2;
-
         inflate(context, R.layout.alarm_view, this);
-
-        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.AlarmView);
-        CharSequence timeText = arr.getText(index2);
-        CharSequence daysText = arr.getText(index0);
-        boolean enabled = arr.getBoolean(index1, false);
-        arr.recycle();
 
         initComponents();
 
-        setTime(timeText);
-        setDays(daysText);
-        setEnabler(enabled);
+        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.AlarmView);
+        try{
+            for(int i = 0; i < arr.getIndexCount(); i++) {
+                int attr = arr.getIndex(i);
+
+                if(attr == R.styleable.AlarmView_timeText) {
+                    timeText = arr.getString(attr);
+                    setTime();
+                } else if(attr == R.styleable.AlarmView_daysContent) {
+                    String daysString = arr.getString(attr);
+                    if(daysString != null) {
+                        daysBool = Alarm.convertStringToBoolArray(daysString);
+                    }
+                    setDays();
+                } else if(attr == R.styleable.AlarmView_enabled) {
+                    enabled = arr.getBoolean(attr, false);
+                    setEnabler();
+                }
+            }
+        } finally {
+            arr.recycle();
+        }
     }
 
     private void initComponents() {
@@ -63,16 +106,22 @@ public class AlarmView extends LinearLayout {
         enabler = findViewById(R.id.enabler);
     }
 
-    public void setTime(CharSequence timeText) {
+    public void setTime() {
+        if(timeText == null) {
+            timeText = getResources().getString(R.string.default_time);
+        }
         time.setText(timeText);
     }
 
-    public void setDays(CharSequence daysText) {
-        boolean[] days_bool = Alarm.convertStringToBoolArray(daysText.toString());
+    public void setDays() {
+        if(daysBool == null) {
+            daysBool = Alarm.buildBaseDaysArray();
+        }
+
         StringBuilder styleText = new StringBuilder();
 
-        for(int i = 0; i < days_bool.length; i++) {
-            boolean day = days_bool[i];
+        for(int i = 0; i < daysBool.size(); i++) {
+            boolean day = daysBool.get(i);
             String day_l = DAY_LETTERS[i];
 
             if(day) {
@@ -88,7 +137,7 @@ public class AlarmView extends LinearLayout {
         days.setText(Html.fromHtml(styleText.toString()));
     }
 
-    public void setEnabler(boolean enabled) {
+    public void setEnabler() {
         enabler.setChecked(enabled);
     }
 }

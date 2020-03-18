@@ -3,4 +3,11 @@
     <string name="no_alarm">All alarms are off</string>
     <string name="default_time">00:00</string>
     <string name="default_days">S M T W T F S</string>
+    <string name="sat_sun">S</string>
+    <string name="mon">M</string>
+    <string name="tue_thu">T</string>
+    <string name="wed">W</string>
+    <string name="fri">F</string>
+    <string name="alarm_name_hint">Alarm name</string>
+    <string name="save">Save</string>
 </resources>
