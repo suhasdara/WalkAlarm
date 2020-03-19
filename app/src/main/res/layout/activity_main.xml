@@ -38,7 +38,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/alarm_box"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -48,16 +49,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.7"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cur_alarm">
-
-        <LinearLayout
-            android:id="@+id/alarm_box"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-        </LinearLayout>
-
-    </ScrollView>
-
+        app:layout_constraintTop_toBottomOf="@+id/cur_alarm"/>
 
 </android.support.constraint.ConstraintLayout>

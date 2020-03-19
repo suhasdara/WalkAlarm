@@ -12,7 +12,16 @@ import com.suhasdara.walkalarm.model.Alarm;
 import java.util.ArrayList;
 
 public class AlarmDatabaseHelper extends SQLiteOpenHelper {
-    public AlarmDatabaseHelper(Context context) {
+    private static AlarmDatabaseHelper instance;
+
+    public static synchronized AlarmDatabaseHelper getInstance(Context context) {
+        if(instance == null) {
+            instance = new AlarmDatabaseHelper(context);
+        }
+        return instance;
+    }
+
+    private AlarmDatabaseHelper(Context context) {
         super(context, AlarmContract.TABLE_NAME, null, 1);
     }
 
@@ -24,7 +33,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int prevVersion, int newVersion) { /* Do nothing */ }
 
-    public void insertAlarm(Alarm alarm) {
+    public long insertAlarm(Alarm alarm) {
         //New value for row
         ContentValues values = new ContentValues();
         values.put(AlarmContract.TIME, alarm.getTime());
@@ -34,9 +43,14 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
         long id = getWritableDatabase().insert(AlarmContract.TABLE_NAME, null, values);
         alarm.setId(id);
+        return id;
     }
 
-    public void updateAlarm(Alarm alarm) {
+    public int updateAlarm(Alarm alarm) {
+        if(alarm.getId() == Alarm.NO_ID) {
+            insertAlarm(alarm);
+        }
+
         //New value for row
         ContentValues values = new ContentValues();
         values.put(AlarmContract.TIME, alarm.getTime());
@@ -46,7 +60,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
         String whereClause = "_id="+alarm.getId();
 
-        getWritableDatabase().update(AlarmContract.TABLE_NAME, values, whereClause, null);
+        return getWritableDatabase().update(AlarmContract.TABLE_NAME, values, whereClause, null);
     }
 
     public ArrayList<Alarm> getAlarms() {

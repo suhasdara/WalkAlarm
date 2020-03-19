@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.suhasdara.walkalarm.R;
 import com.suhasdara.walkalarm.model.Alarm;
+import com.suhasdara.walkalarm.utils.AlarmUtils;
 
 import java.util.Calendar;
 
@@ -40,12 +41,7 @@ public class AlarmView extends LinearLayout {
         inflate(context, R.layout.alarm_view, this);
         initComponents();
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(alarm.getTime());
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        int minute = cal.get(Calendar.MINUTE);
-        timeText = (hour < 10 ? "0" : "") + hour + ":" + (minute < 10 ? "0" : "") + minute;
-
+        timeText = AlarmUtils.getTextTime(alarm);
         daysBool = alarm.getDays();
         enabled = alarm.isEnabled();
         setTime();
@@ -106,14 +102,23 @@ public class AlarmView extends LinearLayout {
         enabler = findViewById(R.id.enabler);
     }
 
-    public void setTime() {
+    public void setData(Alarm alarm) {
+        timeText = AlarmUtils.getTextTime(alarm);
+        daysBool = alarm.getDays();
+        enabled = alarm.isEnabled();
+        setTime();
+        setDays();
+        setEnabler();
+    }
+
+    private void setTime() {
         if(timeText == null) {
             timeText = getResources().getString(R.string.default_time);
         }
         time.setText(timeText);
     }
 
-    public void setDays() {
+    private void setDays() {
         if(daysBool == null) {
             daysBool = Alarm.buildBaseDaysArray();
         }
@@ -137,7 +142,11 @@ public class AlarmView extends LinearLayout {
         days.setText(Html.fromHtml(styleText.toString()));
     }
 
-    public void setEnabler() {
+    private void setEnabler() {
         enabler.setChecked(enabled);
+    }
+
+    public Switch getEnablerComponent() {
+        return enabler;
     }
 }

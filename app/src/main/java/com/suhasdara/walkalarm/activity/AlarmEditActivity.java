@@ -2,10 +2,10 @@ package com.suhasdara.walkalarm.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ViewUtils;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.Button;
@@ -15,12 +15,14 @@ import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
 import com.suhasdara.walkalarm.R;
+import com.suhasdara.walkalarm.database.AlarmDatabaseHelper;
 import com.suhasdara.walkalarm.model.Alarm;
+import com.suhasdara.walkalarm.service.AlarmLoaderService;
 
 import java.util.Calendar;
 
 public class AlarmEditActivity extends AppCompatActivity {
-    public static final String ALARM = "com.suhasdara.walkalarm.ALARM";
+    public static final String ALARM = "com.suhasdara.walkalarm.activity.AlarmEditActivity.ALARM";
 
     private Button saveButton;
     private ToggleButton[] dayButtons;
@@ -85,7 +87,10 @@ public class AlarmEditActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage(v);
+                Alarm alarm = getCurrentAlarm();
+                AlarmDatabaseHelper.getInstance(AlarmEditActivity.this).updateAlarm(alarm);
+                AlarmLoaderService.launchService(AlarmEditActivity.this);
+                finish();
             }
         });
     }
@@ -172,12 +177,5 @@ public class AlarmEditActivity extends AppCompatActivity {
         alarm_id = Alarm.NO_ID;
 
         return new Alarm(id, time, name, days, true);
-    }
-
-    public void sendMessage(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(ALARM, getCurrentAlarm());
-        setResult(MainActivity.ALARM_EDIT_ACTIVITY_REQUEST_CODE, intent);
-        finish();
     }
 }

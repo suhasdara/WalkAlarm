@@ -130,18 +130,6 @@ public class Alarm implements Parcelable {
         return enabled;
     }
 
-    public void updateInDatabase(AlarmDatabaseHelper db) {
-        if(id != NO_ID) {
-            db.updateAlarm(this);
-        } else {
-            insertInDatabase(db);
-        }
-    }
-
-    public void insertInDatabase(AlarmDatabaseHelper db) {
-        db.insertAlarm(this);
-    }
-
     @Override
     public String toString() {
         return id + "\n" +
