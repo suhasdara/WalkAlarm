@@ -1,5 +1,3 @@
-/* Credit for template: https://github.com/PPartisan/Simple-Alarms/ */
-
 package com.suhasdara.walkalarm.model;
 
 import android.os.Parcel;
@@ -130,6 +128,11 @@ public class Alarm implements Parcelable {
         return enabled;
     }
 
+    public int getNotifId() {
+        return (int) (id ^ (id >>> 32));
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return id + "\n" +

@@ -47,10 +47,6 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int updateAlarm(Alarm alarm) {
-        if(alarm.getId() == Alarm.NO_ID) {
-            insertAlarm(alarm);
-        }
-
         //New value for row
         ContentValues values = new ContentValues();
         values.put(AlarmContract.TIME, alarm.getTime());
@@ -58,9 +54,13 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         values.put(AlarmContract.DAYS, Alarm.convertArrayToString(alarm.getDays()));
         values.put(AlarmContract.ENABLED, alarm.isEnabled() ? 1 : 0);
 
-        String whereClause = "_id="+alarm.getId();
-
+        String whereClause = "_id=" + alarm.getId();
         return getWritableDatabase().update(AlarmContract.TABLE_NAME, values, whereClause, null);
+    }
+
+    public int deleteAlarm(Alarm alarm) {
+        String whereClause = "_id=" + alarm.getId();
+        return getWritableDatabase().delete(AlarmContract.TABLE_NAME, whereClause, null);
     }
 
     public ArrayList<Alarm> getAlarms() {

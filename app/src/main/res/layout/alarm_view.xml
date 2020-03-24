@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="130dp"
     android:background="@drawable/alarm_background">
@@ -36,5 +37,16 @@
         android:paddingRight="5dp"
         android:scaleX="1.2"
         android:scaleY="1.2" />
+
+    <Button
+        android:id="@+id/deleter"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:drawableStart="@android:drawable/ic_delete"
+        android:gravity="center|center_vertical"
+        android:minWidth="0dp"
+        android:minHeight="0dp" />
 
 </LinearLayout>

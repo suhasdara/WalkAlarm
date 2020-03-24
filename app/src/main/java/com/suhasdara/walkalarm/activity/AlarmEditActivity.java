@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ViewUtils;
 import android.util.SparseBooleanArray;
@@ -18,6 +19,7 @@ import com.suhasdara.walkalarm.R;
 import com.suhasdara.walkalarm.database.AlarmDatabaseHelper;
 import com.suhasdara.walkalarm.model.Alarm;
 import com.suhasdara.walkalarm.service.AlarmLoaderService;
+import com.suhasdara.walkalarm.service.AlarmReceiver;
 
 import java.util.Calendar;
 
@@ -35,7 +37,7 @@ public class AlarmEditActivity extends AppCompatActivity {
     private int default_text_color;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_edit);
 
@@ -88,7 +90,15 @@ public class AlarmEditActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Alarm alarm = getCurrentAlarm();
-                AlarmDatabaseHelper.getInstance(AlarmEditActivity.this).updateAlarm(alarm);
+                if(alarm.getId() == Alarm.NO_ID) {
+                    AlarmDatabaseHelper.getInstance(AlarmEditActivity.this).insertAlarm(alarm);
+                    AlarmReceiver.scheduleAlarm(v.getContext(), alarm);
+                } else {
+                    AlarmDatabaseHelper.getInstance(AlarmEditActivity.this).updateAlarm(alarm);
+                    AlarmReceiver.cancelAlarm(v.getContext(), alarm);
+                    AlarmReceiver.scheduleAlarm(v.getContext(), alarm);
+                }
+
                 AlarmLoaderService.launchService(AlarmEditActivity.this);
                 finish();
             }

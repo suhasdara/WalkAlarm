@@ -6,6 +6,7 @@ import android.support.annotation.StyleableRes;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ public class AlarmView extends LinearLayout {
     private TextView days;
     private SparseBooleanArray daysBool;
     private Switch enabler;
+    private Button deleter;
     private boolean enabled;
 
     private static final String[] DAY_LETTERS = {"S", "M", "T", "W", "T", "F", "S"};
@@ -100,6 +102,7 @@ public class AlarmView extends LinearLayout {
         time = findViewById(R.id.time_text);
         days = findViewById(R.id.days_text);
         enabler = findViewById(R.id.enabler);
+        deleter = findViewById(R.id.deleter);
     }
 
     public void setData(Alarm alarm) {
@@ -148,5 +151,9 @@ public class AlarmView extends LinearLayout {
 
     public Switch getEnablerComponent() {
         return enabler;
+    }
+
+    public Button getDeleterComponent() {
+        return deleter;
     }
 }
