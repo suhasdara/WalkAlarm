@@ -82,13 +82,13 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     }
 
     private void deleterListener(final Context context, final Alarm alarm) {
-        AlarmDatabaseHelper.getInstance(context).deleteAlarm(alarm);
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_AppCompat_Dialog)
                 .setTitle(R.string.delete_dialog_title)
                 .setMessage(R.string.delete_dialog_content)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        AlarmDatabaseHelper.getInstance(context).deleteAlarm(alarm);
                         AlarmReceiver.cancelAlarm(context, alarm);
                         AlarmLoaderService.launchService(context);
                     }
