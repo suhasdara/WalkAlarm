@@ -11,10 +11,10 @@
 
     <string name="alarm_name_hint">Alarm name</string>
     <string name="save">Save</string>
-    <string name="delete_dialog_title">Confirm Alarm Deletion</string>
-    <string name="delete_dialog_content">Do you want to delete this alarm?</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="delete_dialog_title"><font color="#000000">Confirm Alarm Deletion</font></string>
+    <string name="delete_dialog_content"><font color="#000000">Do you want to delete this alarm?</font></string>
+    <string name="ok"><font color="#d81b60">OK</font></string>
+    <string name="cancel"><font color="#000000">Cancel</font></string>
 
     <string name="target_walk">Walk the alarm off!</string>
     <string name="target_dismiss">You earned the dismiss!</string>

@@ -13,6 +13,7 @@
         android:layout_height="0dp"
         android:gravity="center|center_vertical"
         android:text="@string/target_walk"
+        android:textColor="@android:color/black"
         android:textSize="36sp"
         app:fontFamily="sans-serif-medium"
         app:layout_constraintBottom_toTopOf="@+id/counter_layout"
@@ -38,8 +39,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="end|center_vertical"
-            android:textSize="125sp"
             android:text="@string/default_zero"
+            android:textColor="@android:color/black"
+            android:textSize="125sp"
             app:fontFamily="sans-serif-medium" />
 
         <TextView
@@ -48,13 +50,15 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="start|center_vertical"
-            android:textSize="24sp"
             android:text="@string/steps"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
             app:fontFamily="sans-serif-medium" />
     </LinearLayout>
 
     <Button
         android:id="@+id/dismiss"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/dismiss"
